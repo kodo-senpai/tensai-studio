@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TENSAI STUDIO</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: rgba(22, 27, 38, 0.74);
+      --panel-strong: rgba(28, 35, 49, 0.9);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #f7f9ff;
+      --muted: #9aa6bd;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --gold: #f5c451;
+      --rose: #fb7185;
+      --green: #34d399;
+      --paper: #f7f1df;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f7fb;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: rgba(255, 255, 255, 0.94);
+      --line: rgba(15, 23, 42, 0.12);
+      --text: #101624;
+      --muted: #60708a;
+      --shadow: 0 24px 70px rgba(80, 97, 138, 0.22);
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(59, 130, 246, 0.24), transparent 28%),
+        radial-gradient(circle at 78% 0%, rgba(245, 196, 81, 0.14), transparent 30%),
+        linear-gradient(135deg, var(--bg), #121827 52%, #10141d);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    [data-theme="light"] body,
+    body[data-theme="light"] {
+      background:
+        radial-gradient(circle at 14% 8%, rgba(59, 130, 246, 0.18), transparent 28%),
+        radial-gradient(circle at 84% 12%, rgba(245, 196, 81, 0.18), transparent 28%),
+        linear-gradient(135deg, #f4f7fb, #eef2ff 58%, #fff8eb);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0) scale(0.98); }
+
+    .app {
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr) 320px;
+      height: 100vh;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .sidebar {
+      border-radius: 22px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 4px 18px;
+    }
+
+    .logo {
+      width: 42px;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--blue), var(--purple) 58%, var(--gold));
+      box-shadow: 0 12px 36px rgba(59, 130, 246, 0.35);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 5px;
+      overflow: auto;
+      padding-right: 2px;
+      min-width: 0;
+    }
+
+    .nav button {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      padding: 8px 10px;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .nav svg,
+    .toolbar svg,
+    .fab svg,
+    .file-row svg,
+    .tool-button svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .storage {
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line);
+    }
+
+    .meter {
+      height: 7px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--blue), var(--green), var(--gold));
+      border-radius: inherit;
+    }
+
+    main {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      border-radius: 26px;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .greeting h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .greeting p {
+      margin: 7px 0 0;
+      color: var(--muted);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .theme-switch, .primary {
+      min-height: 42px;
+      border-radius: 14px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 14px 34px rgba(59, 130, 246, 0.28);
+      font-weight: 700;
+    }
+
+    .accent-dots {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .dot {
+      width: 22px;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+      padding: 0;
+    }
+
+    .dot.blue { background: #3b82f6; }
+    .dot.purple { background: #8b5cf6; }
+    .dot.gold { background: #f5c451; }
+    .dot.rose { background: #fb7185; }
+    .dot.green { background: #34d399; }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .continue {
+      border-radius: 22px;
+      overflow: hidden;
+      min-height: 280px;
+      position: relative;
+      background:
+        linear-gradient(120deg, rgba(13, 17, 23, 0.12), rgba(13, 17, 23, 0.72)),
+        linear-gradient(135deg, rgba(59, 130, 246, 0.88), rgba(139, 92, 246, 0.82) 48%, rgba(245, 196, 81, 0.76));
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
+    }
+
+    .continue::before {
+      content: "";
+      position: absolute;
+      inset: 18px 22px auto auto;
+      width: 146px;
+      aspect-ratio: 0.72;
+      border-radius: 8px;
+      background: linear-gradient(150deg, #111827 8%, #24314a 48%, #f5c451 49%, #f9ddb2);
+      box-shadow: -18px 20px 50px rgba(0, 0, 0, 0.35);
+      transform: rotate(8deg);
+    }
+
+    .continue::after {
+      content: "";
+      position: absolute;
+      right: 54px;
+      top: 52px;
+      width: 116px;
+      height: 168px;
+      border-radius: 6px;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.34) 1px, transparent 1px, transparent 14px),
+        linear-gradient(#faf4df, #e8d7ad);
+      transform: rotate(-7deg);
+      box-shadow: -16px 18px 42px rgba(0, 0, 0, 0.26);
+    }
+
+    .continue-content {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+    }
+
+    .continue h3 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .continue p {
+      margin: 10px 0 18px;
+      max-width: 48ch;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .mini-dashboard {
+      border-radius: 22px;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .goal h3, .panel-title {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .goal strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .stats-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .stat b { display: block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .creation-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(112px, 1fr));
+      gap: 12px;
+    }
+
+    .type-card {
+      min-height: 128px;
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+      text-align: left;
+      display: grid;
+      align-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .type-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -24px -26px auto;
+      width: 86px;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent, var(--blue)) 40%, transparent);
+      filter: blur(2px);
+    }
+
+    .type-card span {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      aspect-ratio: 1;
+      border-radius: 13px;
+      background: color-mix(in srgb, var(--accent, var(--blue)) 28%, transparent);
+    }
+
+    .type-card b { font-size: 16px; }
+    .type-card small { color: var(--muted); }
+
+    .files {
+      display: grid;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 32px minmax(140px, 1fr) 100px 96px 38px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .file-row:last-child { border-bottom: 0; }
+    .file-row:hover { background: rgba(255, 255, 255, 0.07); }
+    .file-row.active { background: rgba(59, 130, 246, 0.14); color: var(--text); }
+    .file-row b { color: var(--text); font-weight: 650; }
+
+    .editor-wrap {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .chapter-panel {
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    .book-meta {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .book-meta input,
+    .chapter-name-input {
+      width: 100%;
+      min-height: 36px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      padding: 0 10px;
+      outline: none;
+    }
+
+    .chapter-name-input {
+      min-width: 0;
+      background: transparent;
+      border-color: transparent;
+      padding: 0;
+      font-weight: 700;
+    }
+
+    .chapter.active .chapter-name-input {
+      color: var(--text);
+    }
+
+    .chapter-name-input:focus,
+    .book-meta input:focus {
+      border-color: rgba(59, 130, 246, 0.58);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .chapters {
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .chapter {
+      border-radius: 13px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .chapter.active {
+      color: var(--text);
+      border-color: rgba(59, 130, 246, 0.46);
+      background: rgba(59, 130, 246, 0.13);
+    }
+
+    .editor {
+      min-width: 0;
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      min-height: 58px;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      overflow: auto;
+    }
+
+    .tool-button {
+      min-width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 800;
+    }
+
+    .tool-wide {
+      width: auto;
+      padding: 0 12px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .range-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 170px;
+      padding: 0 10px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      accent-color: var(--blue);
+      width: 86px;
+    }
+
+    .page-stage {
+      min-height: 620px;
+      padding: 26px;
+      display: grid;
+      place-items: start center;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .page {
+      width: min(100%, 680px);
+      min-height: 760px;
+      border-radius: 10px;
+      padding: 58px 62px;
+      color: #1b1a17;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)),
+        radial-gradient(circle at 20% 0%, #fff7d7, transparent 40%),
+        var(--paper);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.75;
+      outline: none;
+      transition: font-size 160ms ease;
+    }
+
+    .page h2 {
+      margin: 0 0 22px;
+      font-size: 34px;
+      line-height: 1.15;
+      color: #111827;
+    }
+
+    .page p { margin: 0 0 18px; }
+
+    .statusbar {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .statusbar div {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      border-right: 1px solid var(--line);
+      text-align: center;
+      padding: 8px;
+    }
+
+    .statusbar div:last-child { border-right: 0; }
+    .statusbar b { color: var(--text); font-size: 13px; }
+
+    .rightbar {
+      min-height: 0;
+      overflow: auto;
+      border-radius: 22px;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .tool-panel {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 14px;
+      scroll-margin-top: 18px;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .tool-panel.active {
+      border-color: color-mix(in srgb, var(--blue) 70%, white 10%);
+      background: linear-gradient(145deg, rgba(59, 130, 246, 0.16), rgba(255, 255, 255, 0.06));
+      transform: translateY(-2px);
+    }
+
+    .tool-panel h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      padding: 0 11px;
+      outline: none;
+    }
+
+    .chip {
+      border-radius: 999px;
+      min-height: 32px;
+      padding: 0 11px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .chip.active {
+      color: var(--text);
+      border-color: rgba(245, 196, 81, 0.44);
+      background: rgba(245, 196, 81, 0.13);
+    }
+
+    .cover-card {
+      aspect-ratio: 0.72;
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(135deg, rgba(4, 8, 18, 0.24), rgba(4, 8, 18, 0.76)),
+        linear-gradient(150deg, #3b82f6, #8b5cf6 48%, #f5c451);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cover-card.image-mode {
+      background: #0b1020;
+    }
+
+    .cover-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: var(--cover-opacity, 1);
+      filter: blur(var(--cover-blur, 0px));
+      transform: scale(var(--cover-zoom, 1));
+      transform-origin: center;
+      z-index: 0;
+      display: none;
+    }
+
+    .cover-card.image-mode .cover-image {
+      display: block;
+    }
+
+    .cover-card.image-mode::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.52), transparent 42%, rgba(0, 0, 0, 0.58));
+      z-index: 1;
+    }
+
+    .cover-card::before {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      z-index: 2;
+    }
+
+    .cover-card strong {
+      position: relative;
+      z-index: 3;
+      font-family: Georgia, serif;
+      font-size: 30px;
+      line-height: 1;
+      max-width: 9ch;
+    }
+
+    .cover-card span {
+      position: relative;
+      z-index: 3;
+      color: rgba(255, 255, 255, 0.76);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+    }
+
+    .cover-tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toggle-line {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toggle-line input {
+      width: auto;
+      min-height: auto;
+      accent-color: var(--blue);
+    }
+
+    .ai-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .ai-list button {
+      min-height: 38px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line);
+      text-align: left;
+      padding: 0 12px;
+      color: var(--muted);
+    }
+
+    .preview-strip {
+      display: grid;
+      gap: 10px;
+    }
+
+    .book-preview {
+      height: 128px;
+      border-radius: 16px;
+      perspective: 900px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(245, 196, 81, 0.18), transparent 38%),
+        rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .book {
+      width: 78px;
+      height: 104px;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: floatBook 4s ease-in-out infinite;
+    }
+
+    .book::before,
+    .book::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      transform-origin: left;
+    }
+
+    .book::before {
+      background: linear-gradient(135deg, #111827, #3b82f6 58%, #f5c451);
+      transform: rotateY(-24deg);
+      box-shadow: 14px 18px 38px rgba(0, 0, 0, 0.32);
+    }
+
+    .book::after {
+      left: 9px;
+      background: repeating-linear-gradient(0deg, #fbf1d2, #fbf1d2 5px, #eadbad 6px);
+      transform: rotateY(-52deg);
+      opacity: 0.86;
+    }
+
+    @keyframes floatBook {
+      0%, 100% { transform: rotateX(9deg) rotateY(-18deg) translateY(0); }
+      50% { transform: rotateX(12deg) rotateY(-31deg) translateY(-8px); }
+    }
+
+    .fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      display: grid;
+      gap: 10px;
+      z-index: 6;
+    }
+
+    .fab button {
+      width: 48px;
+      aspect-ratio: 1;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 18px 46px rgba(59, 130, 246, 0.32);
+    }
+
+    .fab button:not(:first-child) {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      transition: opacity 220ms ease, transform 220ms ease;
+      z-index: 7;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    body.focus-mode .sidebar,
+    body.focus-mode .rightbar,
+    body.focus-mode .topbar,
+    body.focus-mode .section:not(.editor-wrap),
+    body.focus-mode .chapter-panel,
+    body.focus-mode .fab {
+      display: none;
+    }
+
+    body.focus-mode .app {
+      grid-template-columns: 1fr;
+      padding: 0;
+    }
+
+    body.focus-mode main {
+      border-radius: 0;
+      min-height: 100vh;
+    }
+
+    body.focus-mode .editor-wrap {
+      grid-template-columns: 1fr;
+      margin-top: 0;
+    }
+
+    @media (max-width: 1350px) {
+      body { overflow: auto; }
+      .app {
+        grid-template-columns: 86px minmax(0, 1fr);
+        height: auto;
+        min-height: 100vh;
+      }
+      .sidebar { padding: 14px 10px; }
+      .brand { justify-content: center; }
+      .brand div:not(.logo), .nav span.label, .storage, .rightbar { display: none; }
+      .rightbar.open {
+        display: grid;
+        position: fixed;
+        right: 16px;
+        top: 16px;
+        bottom: 16px;
+        width: min(360px, calc(100vw - 116px));
+        z-index: 20;
+      }
+      .nav button { grid-template-columns: 1fr; place-items: center; }
+      main { grid-column: 2; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .creation-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .editor-wrap { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        grid-template-columns: 1fr;
+        padding: 10px;
+      }
+      .sidebar {
+        position: sticky;
+        top: 10px;
+        z-index: 5;
+        min-height: auto;
+        overflow: hidden;
+      }
+      .brand, .sidebar-footer { display: none; }
+      .nav {
+        display: flex;
+        overflow-x: auto;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      .nav button {
+        min-width: 44px;
+        height: 44px;
+        padding: 0;
+      }
+      main {
+        grid-column: auto;
+        padding: 14px;
+      }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .top-actions { justify-content: flex-start; }
+      .creation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .file-row { grid-template-columns: 30px 1fr 38px; }
+      .file-row span:nth-of-type(2),
+      .file-row span:nth-of-type(3) { display: none; }
+      .page-stage { padding: 12px; min-height: 540px; }
+      .page { padding: 34px 24px; min-height: 620px; }
+      .statusbar { grid-template-columns: repeat(2, 1fr); }
+      .continue::before, .continue::after { opacity: 0.5; }
+      .fab { right: 14px; bottom: 14px; }
+      .rightbar.open {
+        left: 10px;
+        right: 10px;
+        top: 72px;
+        bottom: 10px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar glass">
+      <div class="brand">
+        <div class="logo">TS</div>
+        <div>
+          <h1>TENSAI STUDIO</h1>
+          <p>Premium writing suite</p>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="active" title="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span class="label">Home</span></button>
+        <button title="Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg><span class="label">Library</span></button>
+        <button title="Recent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><path d="M3.05 11a9 9 0 1 1 2.64 6.36"/></svg><span class="label">Recent</span></button>
+        <button title="Poems"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span class="label">Poems</span></button>
+        <button title="Stories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M9 7h5M9 11h5"/></svg><span class="label">Stories</span></button>
+        <button title="Novels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 4h11a2 2 0 0 1 2 2v15H8a3 3 0 0 1-3-3V5a1 1 0 0 1 1-1z"/><path d="M8 18h11"/></svg><span class="label">Novels</span></button>
+        <button title="Collections"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18M5 7l1 13h12l1-13M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span class="label">Collections</span></button>
+        <button title="Templates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span class="label">Templates</span></button>
+        <button title="Fonts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg><span class="label">Fonts</span></button>
+        <button title="Covers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 3h14v18H5z"/><path d="M9 7h6M9 17h6"/></svg><span class="label">Covers</span></button>
+        <button title="PDF Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 16h8M8 12h8"/></svg><span class="label">PDF Export</span></button>
+        <button title="Cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17.5 19H7a5 5 0 0 1-.4-9.98A7 7 0 0 1 20 11.5a3.75 3.75 0 0 1-2.5 7.5z"/></svg><span class="label">Cloud</span></button>
+        <button title="Trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15"/></svg><span class="label">Trash</span></button>
+        <button title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06-2.12 2.12-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V20h-3v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06-2.12-2.12.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1H3v-3h.09A1.65 1.65 0 0 0 4.6 10a1.65 1.65 0 0 0-.33-1.82l-.06-.06L6.33 6l.06.06A1.65 1.65 0 0 0 8.2 6.4h.1a1.65 1.65 0 0 0 1-1.51V4h3v.09a1.65 1.65 0 0 0 1 1.51h.1a1.65 1.65 0 0 0 1.82-.33l.06-.06L17.4 7.33l-.06.06A1.65 1.65 0 0 0 17 9.2v.1a1.65 1.65 0 0 0 1.51 1H20v3h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="label">Settings</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="storage">
+          <b>Autosave live</b>
+          <p style="margin:5px 0 0;color:var(--muted);font-size:12px">Every second synced locally</p>
+          <div class="meter"><span></span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="glass">
+      <div class="topbar">
+        <div class="greeting">
+          <h2>Good Evening,<br>Priyanshu</h2>
+          <p>Continue Writing, design covers, export books, and track every word.</p>
+        </div>
+        <div class="top-actions">
+          <div class="accent-dots" aria-label="Accent colors">
+            <button class="dot blue" data-accent="#3b82f6" title="Royal Blue"></button>
+            <button class="dot purple" data-accent="#8b5cf6" title="Purple"></button>
+            <button class="dot gold" data-accent="#f5c451" title="Gold"></button>
+            <button class="dot rose" data-accent="#fb7185" title="Rose"></button>
+            <button class="dot green" data-accent="#34d399" title="Emerald"></button>
+          </div>
+          <button class="theme-switch" id="themeToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>Theme</button>
+          <button class="primary"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>New Draft</button>
+        </div>
+      </div>
+
+      <section class="hero-grid">
+        <div class="continue">
+          <div class="continue-content">
+            <h3>Continue Writing</h3>
+            <p>“The City of Blue Fire” is waiting at Chapter 4. Typewriter mode, live goals, and cinematic preview are ready.</p>
+            <button class="primary">Open Editor</button>
+          </div>
+        </div>
+        <div class="mini-dashboard glass">
+          <div class="goal">
+            <h3>Daily Goal</h3>
+            <strong>742 / 1000</strong>
+            <div class="meter"><span style="width:74%"></span></div>
+          </div>
+          <div class="stats-mini">
+            <div class="stat"><b>18</b><span>Day streak</span></div>
+            <div class="stat"><b>42k</b><span>Words</span></div>
+            <div class="stat"><b>12</b><span>Poems</span></div>
+            <div class="stat"><b>7</b><span>Characters</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>Create Beautiful</h3><span style="color:var(--muted)">Novel, poem, story, quotes, diary, scripts</span></div>
+        <div class="creation-grid">
+          <button class="type-card" style="--accent:var(--blue)"><span>📖</span><b>Novel</b><small>Chapters, scenes, world</small></button>
+          <button class="type-card" style="--accent:var(--purple)"><span>✍</span><b>Poem</b><small>Fancy layout designer</small></button>
+          <button class="type-card" style="--accent:var(--gold)"><span>📕</span><b>Story</b><small>Quick rich draft</small></button>
+          <button class="type-card" style="--accent:var(--rose)"><span>❝</span><b>Quotes</b><small>Collections and tags</small></button>
+          <button class="type-card" style="--accent:var(--green)"><span>☾</span><b>Diary</b><small>Private and locked</small></button>
+          <button class="type-card" style="--accent:#38bdf8"><span>⌘</span><b>Scripts</b><small>Scenes and dialogue</small></button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>Recent Files</h3><span style="color:var(--muted)">Windows Explorer style</span></div>
+        <div class="files">
+          <div class="file-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6"/></svg><b>My Novel</b><span>Novel</span><span>2 min ago</span><button class="tool-button">⋯</button></div>
+          <div class="file-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><b>Rain Poem</b><span>Poem</span><span>Today</span><button class="tool-button">⋯</button></div>
+          <div class="file-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/></svg><b>Horror Story</b><span>Story</span><span>Yesterday</span><button class="tool-button">⋯</button></div>
+        </div>
+      </section>
+
+      <section class="editor-wrap">
+        <aside class="chapter-panel glass">
+          <div class="book-meta">
+            <h3 class="panel-title">Book Details</h3>
+            <label class="field">Book Title <input id="bookTitleInput" value="My Novel"></label>
+          </div>
+          <div class="chapters">
+            <div class="chapter active"><span>☰ Chapter 1</span><b>••</b></div>
+            <div class="chapter"><span>☰ Chapter 2</span><b>••</b></div>
+            <div class="chapter"><span>☰ Chapter 3</span><b>••</b></div>
+            <div class="chapter"><span>☰ Chapter 4</span><b>••</b></div>
+          </div>
+          <div class="section" style="margin-top:18px">
+            <h3 class="panel-title">Scenes</h3>
+            <div class="chapters">
+              <div class="chapter"><span>Scene 1</span><b style="color:var(--blue)">●</b></div>
+              <div class="chapter"><span>Scene 2</span><b style="color:var(--gold)">●</b></div>
+              <div class="chapter"><span>Scene 3</span><b style="color:var(--rose)">●</b></div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="editor glass">
+          <div class="toolbar" aria-label="Editor toolbar">
+            <button class="tool-button" title="Bold"><b>B</b></button>
+            <button class="tool-button" title="Italic"><i>I</i></button>
+            <button class="tool-button" title="Underline"><u>U</u></button>
+            <button class="tool-button" title="Highlight">▰</button>
+            <button class="tool-button" title="Align left">≡</button>
+            <button class="tool-button" title="Quote">❝</button>
+            <button class="tool-button" title="Code">&lt;/&gt;</button>
+            <button class="tool-button" title="Divider">—</button>
+            <button class="tool-button tool-wide" title="Theme">Classic Book</button>
+            <label class="range-wrap">Size <input id="fontSize" type="range" min="12" max="36" value="18"> <span id="sizeValue">18</span></label>
+          </div>
+          <div class="page-stage">
+            <article class="page" id="page" contenteditable="true">
+              <h2>The City of Blue Fire</h2>
+              <p>The rain did not fall from the sky that evening. It rose from the streets, blue and bright, as if the city had finally remembered it was built over a sleeping star.</p>
+              <p>Aryan pressed his palm against the old library door. Somewhere inside, a book opened by itself and whispered his name.</p>
+              <p>He had promised himself he would never return. But promises are fragile things when a whole kingdom starts dreaming in flames.</p>
+            </article>
+          </div>
+          <div class="statusbar">
+            <div><b id="words">59</b> Words</div>
+            <div><b id="chars">321</b> Characters</div>
+            <div><b id="readTime">1m</b> Reading</div>
+            <div><b id="speakTime">1m</b> Speaking</div>
+            <div><b id="paras">3</b> Paragraphs</div>
+            <div><b id="pages">1</b> Pages</div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <aside class="rightbar glass">
+      <section class="tool-panel" id="aiPanel">
+        <h3>AI Assistant</h3>
+        <div class="ai-list">
+          <button>Rewrite with premium tone</button>
+          <button>Continue Story</button>
+          <button>Generate Character</button>
+          <button>Fix Grammar</button>
+          <button>Plot Twist</button>
+          <button>Poem Improve</button>
+        </div>
+      </section>
+
+      <section class="tool-panel" id="coverPanel">
+        <h3>Book Cover Designer</h3>
+        <div class="cover-card" id="coverCard">
+          <img class="cover-image" id="coverImage" alt="">
+          <span id="coverAuthor">Priyanshu Sharma</span>
+          <strong id="coverTitle">Blue Fire</strong>
+          <span>PNG - JPG - PDF first page</span>
+        </div>
+        <div class="stack" style="margin-top:12px">
+          <label class="field">Add Cover From Gallery <input id="coverImageInput" type="file" accept="image/*"></label>
+          <label class="field">Title <input id="coverTitleInput" value="Blue Fire"></label>
+          <label class="field">Author <input id="coverAuthorInput" value="Priyanshu Sharma"></label>
+          <div class="cover-tools-grid">
+            <label class="field">Fit
+              <select id="coverFit">
+                <option value="cover">Cover</option>
+                <option value="contain">Contain</option>
+                <option value="fill">Fill</option>
+              </select>
+            </label>
+            <label class="field">Zoom <input id="coverZoom" type="range" min="1" max="1.8" step="0.05" value="1"></label>
+            <label class="field">Opacity <input id="coverOpacity" type="range" min="0.25" max="1" step="0.05" value="1"></label>
+            <label class="field">Blur <input id="coverBlur" type="range" min="0" max="8" step="1" value="0"></label>
+            <label class="field">Corners <input id="coverRadius" type="range" min="0" max="28" step="1" value="12"></label>
+            <label class="field">Shadow <input id="coverShadow" type="range" min="0" max="80" step="4" value="48"></label>
+          </div>
+          <label class="toggle-line"><input id="coverTextToggle" type="checkbox" checked> Show title and author</label>
+          <button class="theme-switch" id="removeCoverImage" style="justify-content:center">Remove Custom Image</button>
+          <button class="primary" id="downloadCover" style="justify-content:center">Download Cover PNG</button>
+        </div>
+        <div class="chips" style="margin-top:12px">
+          <button class="chip active" data-cover-style="gradient">Gradient</button>
+          <button class="chip" data-cover-style="royal">Royal</button>
+          <button class="chip" data-cover-style="gold">Gold</button>
+          <button class="chip" data-cover-style="night">Night</button>
+        </div>
+      </section>
+
+      <section class="tool-panel" id="pdfPanel">
+        <h3>PDF Designer</h3>
+        <div class="preview-strip">
+          <div class="book-preview"><div class="book" aria-hidden="true"></div></div>
+          <div class="stack">
+            <label class="field">Page Size
+              <select id="pageSize">
+                <option>A4</option>
+                <option>Letter</option>
+                <option>Book 5x8</option>
+                <option>Kindle</option>
+              </select>
+            </label>
+            <label class="field">Margins
+              <select id="pageMargins">
+                <option>Comfortable</option>
+                <option>Compact</option>
+                <option>Wide</option>
+              </select>
+            </label>
+            <label class="toggle-line"><input id="includeToc" type="checkbox" checked> Add table of contents</label>
+          </div>
+          <div class="chips">
+            <button class="chip active" data-export-kind="pdf">PDF</button>
+            <button class="chip" data-export-kind="html">HTML</button>
+            <button class="chip" data-export-kind="txt">TXT</button>
+            <button class="chip" data-export-kind="md">Markdown</button>
+          </div>
+          <button class="primary" id="exportDesigned" style="width:100%;justify-content:center">Export Ebook PDF</button>
+        </div>
+      </section>
+
+      <section class="tool-panel" id="fontPanel">
+        <h3>Font Studio</h3>
+        <div class="stack">
+          <label class="field">Writing Font
+            <select id="fontFamily">
+              <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+              <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
+              <option value="'Cormorant Garamond', Georgia, serif">Cormorant</option>
+              <option value="'Merriweather', Georgia, serif">Merriweather</option>
+              <option value="'Libre Baskerville', Georgia, serif">Libre Baskerville</option>
+              <option value="'Lora', Georgia, serif">Lora</option>
+              <option value="'Cinzel', Georgia, serif">Cinzel</option>
+              <option value="'Poppins', Arial, sans-serif">Poppins</option>
+              <option value="'Montserrat', Arial, sans-serif">Montserrat</option>
+            </select>
+          </label>
+          <label class="field">Line Spacing <input id="lineSpacing" type="range" min="1.2" max="2.4" step="0.1" value="1.75"></label>
+          <label class="field">Letter Spacing <input id="letterSpacing" type="range" min="0" max="2" step="0.1" value="0"></label>
+          <div class="chips">
+            <button class="chip" data-font-theme="novel">Novel</button>
+            <button class="chip" data-font-theme="poem">Poem</button>
+            <button class="chip" data-font-theme="typewriter">Typewriter</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-panel" id="cloudPanel">
+        <h3>Cloud Backup</h3>
+        <div class="stack">
+          <button class="primary" id="downloadBackup" style="justify-content:center">Download Backup JSON</button>
+          <label class="field">Restore Backup <input id="restoreBackup" type="file" accept="application/json"></label>
+          <div class="chips">
+            <button class="chip active">Local</button>
+            <button class="chip">Google Drive</button>
+            <button class="chip">Dropbox</button>
+            <button class="chip">OneDrive</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-panel">
+        <h3>Mood Music</h3>
+        <div class="chips">
+          <button class="chip active">Rain</button>
+          <button class="chip">Cafe</button>
+          <button class="chip">Library</button>
+          <button class="chip">LoFi</button>
+          <button class="chip">Ocean</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="fab" aria-label="Quick actions">
+    <button title="New Story"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button title="New Chapter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg></button>
+    <button title="New Poem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+  </div>
+  <div class="toast" id="toast">Autosaved just now</div>
+
+  <script>
+    const root = document.documentElement;
+    const body = document.body;
+    const page = document.getElementById("page");
+    const toast = document.getElementById("toast");
+    const fontSize = document.getElementById("fontSize");
+    const sizeValue = document.getElementById("sizeValue");
+    const bookTitleInput = document.getElementById("bookTitleInput");
+    const filesPanel = document.querySelector(".files");
+    const chapterPanel = document.querySelector(".chapter-panel .chapters");
+    const scenePanel = document.querySelector(".chapter-panel .section .chapters");
+    const rightbar = document.querySelector(".rightbar");
+    const panelMap = {
+      Covers: "coverPanel",
+      Fonts: "fontPanel",
+      "PDF Export": "pdfPanel",
+      Cloud: "cloudPanel"
+    };
+    const storageKey = "tensai-studio-state-v3";
+    const defaultHtml = page.innerHTML;
+
+    const starterDocs = [
+      {
+        id: "novel-blue-fire",
+        title: "My Novel",
+        type: "Novel",
+        updated: "Just now",
+        chapters: [
+          { title: "Chapter 1", html: defaultHtml, scenes: ["Opening Image", "Library Door", "Blue Fire"] },
+          { title: "Chapter 2", html: "<h2>Chapter 2</h2><p>Start writing this chapter here.</p>", scenes: ["New Scene"] },
+          { title: "Chapter 3", html: "<h2>Chapter 3</h2><p>Start writing this chapter here.</p>", scenes: ["New Scene"] },
+          { title: "Chapter 4", html: "<h2>Chapter 4</h2><p>Start writing this chapter here.</p>", scenes: ["New Scene"] }
+        ]
+      },
+      { id: "rain-poem", title: "Rain Poem", type: "Poem", updated: "Today", chapters: [{ title: "Poem", html: "<h2>Rain Poem</h2><p>Rain writes softly on the window.</p>", scenes: ["Verse 1"] }] },
+      { id: "horror-story", title: "Horror Story", type: "Story", updated: "Yesterday", chapters: [{ title: "Story", html: "<h2>Horror Story</h2><p>The hallway light blinked once, then answered.</p>", scenes: ["Scene 1"] }] }
+    ];
+
+    let state = loadState();
+    state.exportKind = "pdf";
+    let saveTimer;
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey));
+        if (saved && Array.isArray(saved.docs)) return saved;
+      } catch (error) {}
+      return { docs: starterDocs, activeDocId: starterDocs[0].id, activeChapter: 0, fontSize: 18 };
+    }
+
+    function saveState(show = false) {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      if (show) showToast("Saved");
+    }
+
+    function coverSettings() {
+      state.cover = state.cover || {};
+      return state.cover;
+    }
+
+    function activeDoc() {
+      return state.docs.find((doc) => doc.id === state.activeDocId) || state.docs[0];
+    }
+
+    function activeChapter() {
+      const doc = activeDoc();
+      return doc.chapters[state.activeChapter] || doc.chapters[0];
+    }
+
+    function showToast(message = "Autosaved just now") {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveState(true), 350);
+    }
+
+    function count() {
+      const text = page.innerText.trim();
+      const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+      const chars = text.length;
+      const paras = page.querySelectorAll("p, h1, h2, blockquote").length || Math.max(1, text.split(/\n+/).filter(Boolean).length);
+      document.getElementById("words").textContent = words;
+      document.getElementById("chars").textContent = chars;
+      document.getElementById("readTime").textContent = Math.max(1, Math.ceil(words / 220)) + "m";
+      document.getElementById("speakTime").textContent = Math.max(1, Math.ceil(words / 140)) + "m";
+      document.getElementById("paras").textContent = paras;
+      document.getElementById("pages").textContent = Math.max(1, Math.ceil(words / 500));
+    }
+
+    function renderFiles() {
+      filesPanel.innerHTML = state.docs.map((doc) => `
+        <div class="file-row ${doc.id === state.activeDocId ? "active" : ""}" data-doc-id="${doc.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6"/></svg>
+          <b>${escapeHtml(doc.title)}</b>
+          <span>${escapeHtml(doc.type)}</span>
+          <span>${escapeHtml(doc.updated)}</span>
+          <button class="tool-button" data-action="delete-doc" title="Delete">x</button>
+        </div>
+      `).join("");
+    }
+
+    function renderChapters() {
+      const doc = activeDoc();
+      bookTitleInput.value = doc.title || "Untitled Book";
+      chapterPanel.innerHTML = doc.chapters.map((chapter, index) => `
+        <div class="chapter ${index === state.activeChapter ? "active" : ""}" data-chapter="${index}">
+          <input class="chapter-name-input" data-chapter-name="${index}" value="${escapeHtml(chapter.title)}" aria-label="Chapter name">
+          <b data-action="duplicate-chapter" title="Duplicate">++</b>
+        </div>
+      `).join("");
+      renderScenes();
+    }
+
+    function renderScenes() {
+      const chapter = activeChapter();
+      scenePanel.innerHTML = (chapter.scenes || ["Scene 1"]).map((scene, index) => `
+        <div class="chapter" data-scene="${index}">
+          <span>${escapeHtml(scene)}</span>
+          <b style="color:var(--blue)">o</b>
+        </div>
+      `).join("");
+    }
+
+    function loadDocument(docId, chapterIndex = 0, persistCurrent = true) {
+      const current = activeChapter();
+      if (persistCurrent && current) current.html = page.innerHTML;
+      state.activeDocId = docId;
+      state.activeChapter = chapterIndex;
+      page.innerHTML = activeChapter().html;
+      document.querySelector(".continue-content p").textContent = `"${activeDoc().title}" is open. Autosave and export are ready.`;
+      renderFiles();
+      renderChapters();
+      count();
+      saveState();
+      page.focus();
+    }
+
+    function createDocument(type = "Draft") {
+      const countForType = state.docs.filter((doc) => doc.type === type).length + 1;
+      const title = type === "Novel" ? `Untitled Novel ${countForType}` : `New ${type} ${countForType}`;
+      const doc = {
+        id: "doc-" + Date.now(),
+        title,
+        type,
+        updated: "Just now",
+        chapters: [{ title: type === "Poem" ? "Poem" : "Chapter 1", html: `<h2>${escapeHtml(title)}</h2><p>Start writing here...</p>`, scenes: ["Scene 1"] }]
+      };
+      state.docs.unshift(doc);
+      loadDocument(doc.id, 0);
+      showToast(`${type} created`);
+    }
+
+    function createChapter() {
+      const doc = activeDoc();
+      const number = doc.chapters.length + 1;
+      const chapterTitle = `Chapter ${number}`;
+      doc.chapters.push({ title: chapterTitle, html: `<h2>${chapterTitle}</h2><p>Start writing this chapter here.</p>`, scenes: ["Scene 1"] });
+      state.activeChapter = doc.chapters.length - 1;
+      page.innerHTML = activeChapter().html;
+      renderChapters();
+      saveState(true);
+      page.focus();
+    }
+
+    function renameActiveBook(title) {
+      const doc = activeDoc();
+      doc.title = title.trim() || "Untitled Book";
+      doc.updated = "Just now";
+      document.querySelector(".continue-content p").textContent = `"${doc.title}" is open. Autosave and export are ready.`;
+      if (!coverSettings().title || coverSettings().title === "Blue Fire") {
+        coverSettings().title = doc.title;
+        document.getElementById("coverTitleInput").value = doc.title;
+        updateCoverPreview();
+      }
+      renderFiles();
+      saveState(true);
+    }
+
+    function renameChapter(index, title) {
+      const doc = activeDoc();
+      const chapter = doc.chapters[index];
+      if (!chapter) return;
+      const cleanTitle = title.trim() || `Chapter ${index + 1}`;
+      chapter.title = cleanTitle;
+      doc.updated = "Just now";
+      if (index === state.activeChapter) {
+        const heading = page.querySelector("h1, h2");
+        if (heading) heading.textContent = cleanTitle;
+        else page.insertAdjacentHTML("afterbegin", `<h2>${escapeHtml(cleanTitle)}</h2>`);
+        chapter.html = page.innerHTML;
+      }
+      renderFiles();
+      saveState(true);
+    }
+
+    function createScene() {
+      const chapter = activeChapter();
+      chapter.scenes = chapter.scenes || [];
+      chapter.scenes.push(`Scene ${chapter.scenes.length + 1}`);
+      renderScenes();
+      saveState(true);
+    }
+
+    function duplicateChapter(index) {
+      const doc = activeDoc();
+      const source = doc.chapters[index];
+      doc.chapters.splice(index + 1, 0, { title: `${source.title} Copy`, html: source.html, scenes: [...(source.scenes || [])] });
+      renderChapters();
+      saveState(true);
+    }
+
+    function deleteDocument(docId) {
+      if (state.docs.length === 1) {
+        showToast("Keep at least one file");
+        return;
+      }
+      state.docs = state.docs.filter((doc) => doc.id !== docId);
+      loadDocument(state.docs[0].id, 0);
+      showToast("Moved to Trash");
+    }
+
+    function format(command, value = null) {
+      page.focus();
+      document.execCommand(command, false, value);
+      activeChapter().html = page.innerHTML;
+      count();
+      saveState(true);
+    }
+
+    function insertBlock(html) {
+      page.focus();
+      document.execCommand("insertHTML", false, html);
+      activeChapter().html = page.innerHTML;
+      count();
+      saveState(true);
+    }
+
+    async function exportFile(kind = "pdf") {
+      activeChapter().html = page.innerHTML;
+      saveState();
+      const doc = activeDoc();
+      const title = slug(doc.title);
+      const fullHtml = doc.chapters.map((chapter) => chapter.html).join("<hr>");
+      let blob;
+      let filename;
+      if (kind === "txt") {
+        blob = new Blob([page.innerText], { type: "text/plain" });
+        filename = `${title}.txt`;
+      } else if (kind === "md") {
+        blob = new Blob([page.innerText.replace(/\n{2,}/g, "\n\n")], { type: "text/markdown" });
+        filename = `${title}.md`;
+      } else if (kind === "pdf") {
+        const pdfBytes = await buildEbookPdf(doc);
+        blob = new Blob([pdfBytes], { type: "application/pdf" });
+        filename = `${title}.pdf`;
+      } else {
+        blob = new Blob([`<!doctype html><title>${escapeHtml(doc.title)}</title><main>${fullHtml}</main>`], { type: "text/html" });
+        filename = `${title}.html`;
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast(`Exported ${filename}`);
+    }
+
+    async function buildEbookPdf(doc) {
+      const pageSize = document.getElementById("pageSize").value;
+      const pageMargins = document.getElementById("pageMargins").value;
+      const sizes = {
+        A4: [595.28, 841.89],
+        Letter: [612, 792],
+        "Book 5x8": [360, 576],
+        Kindle: [420, 630]
+      };
+      const marginMap = {
+        Compact: 42,
+        Comfortable: 60,
+        Wide: 78
+      };
+      const [pageWidth, pageHeight] = sizes[pageSize] || sizes.A4;
+      const margin = marginMap[pageMargins] || 60;
+      const coverCanvas = await renderCoverCanvas();
+      const coverJpeg = coverCanvas.toDataURL("image/jpeg", 0.92);
+      const imageBytes = atob(coverJpeg.split(",")[1]);
+      const pdf = createPdfBuilder();
+      const pagesId = pdf.reserve();
+      const fontId = pdf.add("<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman >>");
+      const titleFontId = pdf.add("<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold >>");
+      const imageId = pdf.add(`<< /Type /XObject /Subtype /Image /Width ${coverCanvas.width} /Height ${coverCanvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.length} >>\nstream\n${imageBytes}\nendstream`);
+      const pageIds = [];
+      const coverContent = `q\n${pageWidth} 0 0 ${pageHeight} 0 0 cm\n/Im1 Do\nQ`;
+      const coverContentId = pdf.add(`<< /Length ${coverContent.length} >>\nstream\n${coverContent}\nendstream`);
+      pageIds.push(pdf.add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << /Im1 ${imageId} 0 R >> >> /Contents ${coverContentId} 0 R >>`));
+
+      const chapterBlocks = doc.chapters.map((chapter, index) => ({
+        title: chapter.title || `Chapter ${index + 1}`,
+        text: htmlToPlainText(chapter.html, chapter.title || `Chapter ${index + 1}`)
+      }));
+      if (document.getElementById("includeToc").checked) {
+        const tocStream = makeTocPageStream(doc.title || "Untitled Book", chapterBlocks, pageWidth, pageHeight, margin);
+        const tocContentId = pdf.add(`<< /Length ${tocStream.length} >>\nstream\n${tocStream}\nendstream`);
+        pageIds.push(pdf.add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 ${fontId} 0 R /F2 ${titleFontId} 0 R >> >> /Contents ${tocContentId} 0 R >>`));
+      }
+      const textPages = layoutBookPages(chapterBlocks, pageWidth, pageHeight, margin);
+      textPages.forEach((textPage, index) => {
+        const stream = makeTextPageStream(textPage, index + 1, pageWidth, pageHeight, margin, doc.title || "Untitled Book");
+        const contentId = pdf.add(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+        pageIds.push(pdf.add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 ${fontId} 0 R /F2 ${titleFontId} 0 R >> >> /Contents ${contentId} 0 R >>`));
+      });
+      pdf.set(pagesId, `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pageIds.length} >>`);
+      const catalogId = pdf.add(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+      return pdf.finish(catalogId);
+    }
+
+    function createPdfBuilder() {
+      const objects = [null];
+      return {
+        reserve() {
+          objects.push("");
+          return objects.length - 1;
+        },
+        add(content) {
+          objects.push(content);
+          return objects.length - 1;
+        },
+        set(id, content) {
+          objects[id] = content;
+        },
+        finish(rootId) {
+          let body = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
+          const offsets = [0];
+          for (let i = 1; i < objects.length; i++) {
+            offsets[i] = body.length;
+            body += `${i} 0 obj\n${objects[i]}\nendobj\n`;
+          }
+          const xrefOffset = body.length;
+          body += `xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+          for (let i = 1; i < objects.length; i++) {
+            body += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
+          }
+          body += `trailer\n<< /Size ${objects.length} /Root ${rootId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+          const bytes = new Uint8Array(body.length);
+          for (let i = 0; i < body.length; i++) bytes[i] = body.charCodeAt(i) & 255;
+          return bytes;
+        }
+      };
+    }
+
+    function htmlToPlainText(html, chapterTitle = "") {
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+      temp.querySelectorAll("script, style").forEach((node) => node.remove());
+      const firstHeading = temp.querySelector("h1, h2");
+      if (firstHeading && firstHeading.textContent.trim().toLowerCase() === chapterTitle.trim().toLowerCase()) {
+        firstHeading.remove();
+      }
+      return temp.innerText.replace(/\u00a0/g, " ").replace(/[“”]/g, '"').replace(/[‘’]/g, "'").trim();
+    }
+
+    function layoutBookPages(chapters, pageWidth, pageHeight, margin) {
+      const pages = [];
+      let current = [];
+      let y = pageHeight - margin - 38;
+      const maxWidth = pageWidth - margin * 2;
+      const lineHeight = 15;
+      const bottom = margin + 32;
+      const addPage = () => {
+        if (current.length) pages.push(current);
+        current = [];
+        y = pageHeight - margin - 38;
+      };
+      chapters.forEach((chapter, chapterIndex) => {
+        if (chapterIndex > 0) addPage();
+        const chapterTitleLines = wrapPdfText(chapter.title, maxWidth - 18, 18);
+        const chapterBlockHeight = chapterTitleLines.length * 24 + 16;
+        if (y - chapterBlockHeight < bottom) addPage();
+        chapterTitleLines.forEach((titleLine, titleIndex) => {
+          current.push({
+            text: titleLine,
+            size: 18,
+            font: "F2",
+            gap: titleIndex === chapterTitleLines.length - 1 ? 40 : 24,
+            type: "chapter",
+            first: titleIndex === 0,
+            last: titleIndex === chapterTitleLines.length - 1
+          });
+          y -= 24;
+        });
+        y -= 16;
+        const paragraphs = chapter.text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+        paragraphs.forEach((paragraph) => {
+          const lines = wrapPdfText(paragraph, maxWidth, 11);
+          lines.forEach((line) => {
+            if (y < bottom) addPage();
+            current.push({ text: line, size: 11, font: "F1", gap: lineHeight });
+            y -= lineHeight;
+          });
+          y -= 8;
+        });
+      });
+      addPage();
+      return pages.length ? pages : [[{ text: "Start writing your book...", size: 11, font: "F1", gap: 15 }]];
+    }
+
+    function wrapPdfText(text, maxWidth, fontSize) {
+      const maxChars = Math.max(28, Math.floor(maxWidth / (fontSize * 0.48)));
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = "";
+      words.forEach((word) => {
+        if (word.length > maxChars) {
+          if (line) {
+            lines.push(line);
+            line = "";
+          }
+          for (let i = 0; i < word.length; i += maxChars) {
+            lines.push(word.slice(i, i + maxChars));
+          }
+          return;
+        }
+        const next = line ? `${line} ${word}` : word;
+        if (next.length > maxChars && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = next;
+        }
+      });
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function makeTocPageStream(bookTitle, chapters, pageWidth, pageHeight, margin) {
+      let y = pageHeight - margin - 18;
+      const parts = [];
+      parts.push(`BT /F2 20 Tf 1 0 0 1 ${margin} ${y.toFixed(2)} Tm (${pdfEscape(bookTitle)}) Tj ET`);
+      y -= 42;
+      parts.push(`BT /F2 15 Tf 1 0 0 1 ${margin} ${y.toFixed(2)} Tm (Table of Contents) Tj ET`);
+      y -= 28;
+      chapters.forEach((chapter, index) => {
+        const titleLines = wrapPdfText(`${index + 1}. ${chapter.title}`, pageWidth - margin * 2, 11);
+        titleLines.forEach((line) => {
+          if (y < margin + 30) return;
+          parts.push(`BT /F1 11 Tf 1 0 0 1 ${margin} ${y.toFixed(2)} Tm (${pdfEscape(line)}) Tj ET`);
+          y -= 17;
+        });
+        y -= 5;
+      });
+      parts.push(`BT /F1 9 Tf 1 0 0 1 ${(pageWidth / 2 - 18).toFixed(2)} ${(margin / 2).toFixed(2)} Tm (Contents) Tj ET`);
+      return parts.join("\n");
+    }
+
+    function makeTextPageStream(lines, pageNumber, pageWidth, pageHeight, margin, bookTitle) {
+      let y = pageHeight - margin - 38;
+      const parts = [];
+      const headerTitle = clampPdfText(bookTitle, pageWidth - margin * 2, 10);
+      parts.push(`BT /F2 10 Tf 1 0 0 1 ${margin} ${(pageHeight - margin + 14).toFixed(2)} Tm (${pdfEscape(headerTitle)}) Tj ET`);
+      parts.push(`0.74 0.74 0.74 RG ${margin} ${(pageHeight - margin + 2).toFixed(2)} m ${(pageWidth - margin).toFixed(2)} ${(pageHeight - margin + 2).toFixed(2)} l S`);
+      lines.forEach((line) => {
+        if (line.type === "chapter") {
+          parts.push(`0.94 0.84 0.42 rg ${margin - 8} ${(y - 7).toFixed(2)} ${(pageWidth - margin * 2 + 16).toFixed(2)} 24 re f`);
+          parts.push(`0.14 0.10 0.02 rg`);
+        } else {
+          parts.push(`0 0 0 rg`);
+        }
+        parts.push(`BT /${line.font} ${line.size} Tf 1 0 0 1 ${margin} ${y.toFixed(2)} Tm (${pdfEscape(line.text)}) Tj ET`);
+        y -= line.gap;
+      });
+      parts.push(`0 0 0 rg`);
+      parts.push(`BT /F1 9 Tf 1 0 0 1 ${(pageWidth / 2 - 12).toFixed(2)} ${(margin / 2).toFixed(2)} Tm (${pageNumber}) Tj ET`);
+      return parts.join("\n");
+    }
+
+    function pdfEscape(value) {
+      return String(value)
+        .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "")
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)");
+    }
+
+    function clampPdfText(text, maxWidth, fontSize) {
+      const maxChars = Math.max(18, Math.floor(maxWidth / (fontSize * 0.52)));
+      const clean = String(text || "");
+      return clean.length > maxChars ? `${clean.slice(0, Math.max(0, maxChars - 3))}...` : clean;
+    }
+
+    function downloadBlob(filename, type, content) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openToolPanel(label) {
+      const panelId = panelMap[label];
+      if (!panelId) return false;
+      rightbar.classList.add("open");
+      document.querySelectorAll(".tool-panel").forEach((panel) => panel.classList.remove("active"));
+      const panel = document.getElementById(panelId);
+      panel.classList.add("active");
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast(`${label} opened`);
+      return true;
+    }
+
+    function applyFontTheme(theme) {
+      if (theme === "novel") {
+        page.style.fontFamily = "Georgia, 'Times New Roman', serif";
+        page.style.lineHeight = "1.75";
+        page.style.letterSpacing = "0px";
+      }
+      if (theme === "poem") {
+        page.style.fontFamily = "'Cormorant Garamond', Georgia, serif";
+        page.style.lineHeight = "2";
+        page.style.letterSpacing = "0.4px";
+      }
+      if (theme === "typewriter") {
+        page.style.fontFamily = "'Courier New', monospace";
+        page.style.lineHeight = "1.65";
+        page.style.letterSpacing = "0px";
+      }
+      activeChapter().html = page.innerHTML;
+      saveState(true);
+    }
+
+    function renderCoverCanvas() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 1800;
+      const ctx = canvas.getContext("2d");
+      const title = document.getElementById("coverTitleInput").value || activeDoc().title;
+      const author = document.getElementById("coverAuthorInput").value || "Priyanshu Sharma";
+      const finish = (resolve) => {
+        ctx.fillStyle = "rgba(0,0,0,0.34)";
+        ctx.fillRect(0, 0, 1200, 1800);
+        if (document.getElementById("coverTextToggle").checked) {
+          ctx.strokeStyle = "rgba(255,255,255,0.62)";
+          ctx.lineWidth = 8;
+          ctx.strokeRect(110, 110, 980, 1580);
+          ctx.fillStyle = "#ffffff";
+          ctx.textAlign = "center";
+          ctx.font = "78px Georgia";
+          ctx.fillText(author.toUpperCase(), 600, 260);
+          ctx.font = "bold 154px Georgia";
+          wrapCanvasText(ctx, title, 600, 760, 900, 170);
+          ctx.font = "54px Georgia";
+          ctx.fillText("TENSAI STUDIO", 600, 1550);
+        }
+        resolve(canvas);
+      };
+
+      return new Promise((resolve) => {
+        if (coverSettings().image) {
+          const image = new Image();
+          image.onload = () => {
+            drawCoverImage(ctx, image, canvas.width, canvas.height, coverSettings().fit || "cover");
+            finish(resolve);
+          };
+          image.src = coverSettings().image;
+          return;
+        }
+
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 1800);
+        gradient.addColorStop(0, "#3b82f6");
+        gradient.addColorStop(0.55, "#8b5cf6");
+        gradient.addColorStop(1, "#f5c451");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 1800);
+        finish(resolve);
+      });
+    }
+
+    async function downloadCoverPng() {
+      const canvas = await renderCoverCanvas();
+      const title = document.getElementById("coverTitleInput").value || activeDoc().title;
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = `${slug(title)}-cover.png`;
+      link.click();
+      showToast("Cover PNG downloaded");
+    }
+
+    function drawCoverImage(ctx, image, width, height, fit) {
+      let drawWidth = width;
+      let drawHeight = height;
+      let x = 0;
+      let y = 0;
+      const sourceRatio = image.width / image.height;
+      const targetRatio = width / height;
+      if (fit === "contain") {
+        if (sourceRatio > targetRatio) {
+          drawWidth = width;
+          drawHeight = width / sourceRatio;
+          y = (height - drawHeight) / 2;
+        } else {
+          drawHeight = height;
+          drawWidth = height * sourceRatio;
+          x = (width - drawWidth) / 2;
+        }
+        ctx.fillStyle = "#080c16";
+        ctx.fillRect(0, 0, width, height);
+      } else if (fit === "cover") {
+        if (sourceRatio > targetRatio) {
+          drawHeight = height;
+          drawWidth = height * sourceRatio;
+          x = (width - drawWidth) / 2;
+        } else {
+          drawWidth = width;
+          drawHeight = width / sourceRatio;
+          y = (height - drawHeight) / 2;
+        }
+      }
+      const zoom = Number(coverSettings().zoom || 1);
+      if (zoom !== 1) {
+        const zoomedWidth = drawWidth * zoom;
+        const zoomedHeight = drawHeight * zoom;
+        x -= (zoomedWidth - drawWidth) / 2;
+        y -= (zoomedHeight - drawHeight) / 2;
+        drawWidth = zoomedWidth;
+        drawHeight = zoomedHeight;
+      }
+      ctx.globalAlpha = Number(coverSettings().opacity || 1);
+      ctx.filter = `blur(${Number(coverSettings().blur || 0) * 2}px)`;
+      ctx.drawImage(image, x, y, drawWidth, drawHeight);
+      ctx.globalAlpha = 1;
+      ctx.filter = "none";
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(" ");
+      let line = "";
+      words.forEach((word, index) => {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = word;
+          y += lineHeight;
+        } else {
+          line = test;
+        }
+        if (index === words.length - 1) ctx.fillText(line, x, y);
+      });
+    }
+
+    function updateCoverPreview() {
+      const title = document.getElementById("coverTitleInput").value || activeDoc().title;
+      const author = document.getElementById("coverAuthorInput").value || "Priyanshu Sharma";
+      document.getElementById("coverTitle").textContent = title;
+      document.getElementById("coverAuthor").textContent = author;
+      coverSettings().title = title;
+      coverSettings().author = author;
+      saveState();
+    }
+
+    function applyCoverSettings() {
+      const settings = coverSettings();
+      const coverCard = document.getElementById("coverCard");
+      const coverImage = document.getElementById("coverImage");
+      const showText = settings.showText !== false;
+      document.getElementById("coverTitleInput").value = settings.title || "Blue Fire";
+      document.getElementById("coverAuthorInput").value = settings.author || "Priyanshu Sharma";
+      document.getElementById("coverFit").value = settings.fit || "cover";
+      document.getElementById("coverZoom").value = settings.zoom || 1;
+      document.getElementById("coverOpacity").value = settings.opacity || 1;
+      document.getElementById("coverBlur").value = settings.blur || 0;
+      document.getElementById("coverRadius").value = settings.radius || 12;
+      document.getElementById("coverShadow").value = settings.shadow || 48;
+      document.getElementById("coverTextToggle").checked = showText;
+      if (settings.image) {
+        coverCard.classList.add("image-mode");
+        coverImage.src = settings.image;
+      } else {
+        coverCard.classList.remove("image-mode");
+        coverImage.removeAttribute("src");
+      }
+      coverImage.style.objectFit = settings.fit || "cover";
+      coverCard.style.setProperty("--cover-opacity", settings.opacity || 1);
+      coverCard.style.setProperty("--cover-blur", `${settings.blur || 0}px`);
+      coverCard.style.setProperty("--cover-zoom", settings.zoom || 1);
+      coverCard.style.borderRadius = `${settings.radius || 12}px`;
+      coverCard.style.boxShadow = `0 18px ${settings.shadow || 48}px rgba(0, 0, 0, 0.32)`;
+      document.getElementById("coverTitle").style.display = showText ? "" : "none";
+      document.getElementById("coverAuthor").style.display = showText ? "" : "none";
+      updateCoverPreview();
+    }
+
+    function downloadBackup() {
+      activeChapter().html = page.innerHTML;
+      saveState();
+      downloadBlob(`tensai-backup-${Date.now()}.json`, "application/json", JSON.stringify(state, null, 2));
+      showToast("Backup downloaded");
+    }
+
+    function aiAssist(label) {
+      const snippets = {
+        "Rewrite with premium tone": "<p><strong>Premium rewrite:</strong> The scene now carries more atmosphere, sharper emotion, and a cleaner literary rhythm.</p>",
+        "Continue Story": "<p>The door opened without sound, revealing shelves that curved upward into darkness like the ribs of a giant cathedral.</p>",
+        "Generate Character": "<p><strong>Character:</strong> Ira Vey, 27, archivist, fearless in public, secretly terrified of forgotten names.</p>",
+        "Fix Grammar": "<p><strong>Grammar pass:</strong> Review complete. Keep sentences active, clear, and specific.</p>",
+        "Plot Twist": "<p><strong>Plot twist:</strong> The enemy has been protecting the hero from a prophecy written by the hero's own future self.</p>",
+        "Poem Improve": "<p><strong>Poem note:</strong> Add one concrete image per stanza and let the final line land softly.</p>"
+      };
+      insertBlock(snippets[label] || "<p>Idea added.</p>");
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+
+    function slug(value) {
+      return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "tensai-export";
+    }
+
+    page.addEventListener("input", () => {
+      activeChapter().html = page.innerHTML;
+      activeDoc().updated = "Just now";
+      count();
+      renderFiles();
+      saveState();
+      showToast();
+    });
+
+    page.addEventListener("paste", (event) => {
+      event.preventDefault();
+      const text = event.clipboardData.getData("text/plain");
+      document.execCommand("insertText", false, text);
+    });
+
+    fontSize.addEventListener("input", (event) => {
+      const value = event.target.value;
+      state.fontSize = Number(value);
+      sizeValue.textContent = value;
+      page.style.fontSize = value + "px";
+      saveState();
+    });
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const next = body.getAttribute("data-theme") === "light" ? "dark" : "light";
+      body.setAttribute("data-theme", next);
+      showToast(`${next} theme`);
+    });
+
+    document.querySelectorAll("[data-accent]").forEach((button) => {
+      button.addEventListener("click", () => {
+        root.style.setProperty("--blue", button.dataset.accent);
+        showToast(button.title);
+      });
+    });
+
+    document.querySelectorAll(".toolbar .tool-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const title = button.title;
+        if (title === "Bold") format("bold");
+        if (title === "Italic") format("italic");
+        if (title === "Underline") format("underline");
+        if (title === "Highlight") format("backColor", "#f5c451");
+        if (title === "Align left") format("justifyLeft");
+        if (title === "Quote") insertBlock("<blockquote>Quote goes here...</blockquote>");
+        if (title === "Code") insertBlock("<pre><code>code block</code></pre>");
+        if (title === "Divider") insertBlock("<hr>");
+        if (title === "Theme") {
+          page.style.background = page.style.background ? "" : "#111827";
+          page.style.color = page.style.color ? "" : "#f8fafc";
+          showToast("Page theme changed");
+        }
+      });
+    });
+
+    filesPanel.addEventListener("click", (event) => {
+      const row = event.target.closest(".file-row");
+      if (!row) return;
+      if (event.target.closest("[data-action='delete-doc']")) {
+        deleteDocument(row.dataset.docId);
+        return;
+      }
+      loadDocument(row.dataset.docId, 0);
+      showToast("File opened");
+    });
+
+    bookTitleInput.addEventListener("input", (event) => {
+      renameActiveBook(event.target.value);
+    });
+
+    chapterPanel.addEventListener("input", (event) => {
+      if (!event.target.matches("[data-chapter-name]")) return;
+      renameChapter(Number(event.target.dataset.chapterName), event.target.value);
+    });
+
+    chapterPanel.addEventListener("click", (event) => {
+      if (event.target.matches("[data-chapter-name]")) {
+        event.stopPropagation();
+        return;
+      }
+    }, true);
+
+    chapterPanel.addEventListener("click", (event) => {
+      const chapter = event.target.closest("[data-chapter]");
+      if (!chapter) return;
+      const index = Number(chapter.dataset.chapter);
+      if (event.target.dataset.action === "duplicate-chapter") {
+        duplicateChapter(index);
+        return;
+      }
+      activeChapter().html = page.innerHTML;
+      state.activeChapter = index;
+      page.innerHTML = activeChapter().html;
+      renderChapters();
+      count();
+      saveState();
+      page.focus();
+    });
+
+    scenePanel.addEventListener("click", (event) => {
+      const scene = event.target.closest("[data-scene]");
+      if (!scene) return;
+      insertBlock(`<h3>${escapeHtml(scene.innerText.trim())}</h3><p></p>`);
+    });
+
+    document.querySelectorAll(".type-card").forEach((button) => {
+      button.addEventListener("click", () => createDocument(button.querySelector("b").textContent.trim()));
+    });
+
+    document.querySelectorAll(".primary").forEach((button) => {
+      const text = button.textContent.trim();
+      if (text.includes("New Draft")) button.addEventListener("click", () => createDocument("Draft"));
+      if (text.includes("Open Editor")) button.addEventListener("click", () => page.scrollIntoView({ behavior: "smooth", block: "center" }));
+      if (text.includes("Export") && button.id !== "exportDesigned") button.addEventListener("click", () => exportFile("pdf"));
+    });
+
+    document.querySelectorAll(".ai-list button").forEach((button) => {
+      button.addEventListener("click", () => aiAssist(button.textContent.trim()));
+    });
+
+    document.querySelectorAll(".chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.parentElement.querySelectorAll(".chip").forEach((chip) => chip.classList.remove("active"));
+        button.classList.add("active");
+        if (button.dataset.exportKind) state.exportKind = button.dataset.exportKind;
+        if (button.dataset.fontTheme) applyFontTheme(button.dataset.fontTheme);
+        if (button.dataset.coverStyle) {
+          const styles = {
+            gradient: "linear-gradient(135deg, rgba(4, 8, 18, 0.24), rgba(4, 8, 18, 0.76)), linear-gradient(150deg, #3b82f6, #8b5cf6 48%, #f5c451)",
+            royal: "linear-gradient(135deg, rgba(4, 8, 18, 0.18), rgba(4, 8, 18, 0.72)), linear-gradient(150deg, #172554, #7c3aed 55%, #f8fafc)",
+            gold: "linear-gradient(135deg, rgba(4, 8, 18, 0.22), rgba(4, 8, 18, 0.64)), linear-gradient(150deg, #78350f, #f59e0b 55%, #fff7ed)",
+            night: "linear-gradient(135deg, rgba(4, 8, 18, 0.1), rgba(4, 8, 18, 0.78)), linear-gradient(150deg, #020617, #1e3a8a 62%, #38bdf8)"
+          };
+          document.getElementById("coverCard").style.background = styles[button.dataset.coverStyle];
+        }
+        showToast(button.textContent.trim());
+      });
+    });
+
+    document.querySelectorAll(".nav button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const label = button.textContent.trim();
+        if (openToolPanel(label)) return;
+        if (["Library", "Recent"].includes(label)) document.querySelector(".files").scrollIntoView({ behavior: "smooth", block: "center" });
+        else if (["Novels", "Stories", "Poems", "Templates"].includes(label)) document.querySelector(".creation-grid").scrollIntoView({ behavior: "smooth", block: "center" });
+        else {
+          rightbar.classList.remove("open");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+    });
+
+    document.getElementById("fontFamily").addEventListener("change", (event) => {
+      page.style.fontFamily = event.target.value;
+      saveState(true);
+    });
+
+    document.getElementById("lineSpacing").addEventListener("input", (event) => {
+      page.style.lineHeight = event.target.value;
+      saveState();
+    });
+
+    document.getElementById("letterSpacing").addEventListener("input", (event) => {
+      page.style.letterSpacing = `${event.target.value}px`;
+      saveState();
+    });
+
+    document.getElementById("coverTitleInput").addEventListener("input", updateCoverPreview);
+    document.getElementById("coverAuthorInput").addEventListener("input", updateCoverPreview);
+    document.getElementById("downloadCover").addEventListener("click", downloadCoverPng);
+    document.getElementById("coverImageInput").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("Choose an image file");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        coverSettings().image = reader.result;
+        applyCoverSettings();
+        saveState(true);
+        showToast("Custom cover added");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    ["coverFit", "coverZoom", "coverOpacity", "coverBlur", "coverRadius", "coverShadow"].forEach((id) => {
+      const coverControl = document.getElementById(id);
+      const updateCoverControl = (event) => {
+        const key = id.replace("cover", "").toLowerCase();
+        coverSettings()[key] = event.target.value;
+        applyCoverSettings();
+        saveState();
+      };
+      coverControl.addEventListener("input", updateCoverControl);
+      coverControl.addEventListener("change", updateCoverControl);
+    });
+
+    document.getElementById("coverTextToggle").addEventListener("change", (event) => {
+      coverSettings().showText = event.target.checked;
+      applyCoverSettings();
+      saveState(true);
+    });
+
+    document.getElementById("removeCoverImage").addEventListener("click", () => {
+      coverSettings().image = "";
+      document.getElementById("coverImageInput").value = "";
+      applyCoverSettings();
+      saveState(true);
+      showToast("Custom cover removed");
+    });
+
+    document.getElementById("downloadBackup").addEventListener("click", downloadBackup);
+    document.getElementById("exportDesigned").addEventListener("click", () => exportFile(state.exportKind || "pdf"));
+
+    document.getElementById("restoreBackup").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const restored = JSON.parse(reader.result);
+          if (!restored.docs || !Array.isArray(restored.docs)) throw new Error("Invalid backup");
+          state = restored;
+          saveState();
+          renderFiles();
+          renderChapters();
+          loadDocument(state.activeDocId || state.docs[0].id, state.activeChapter || 0, false);
+          showToast("Backup restored");
+        } catch (error) {
+          showToast("Invalid backup file");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.querySelectorAll(".fab button").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.title === "New Story") createDocument("Story");
+        if (button.title === "New Chapter") createChapter();
+        if (button.title === "New Poem") createDocument("Poem");
+      });
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        activeChapter().html = page.innerHTML;
+        saveState(true);
+      }
+      if (event.key === "F11") {
+        event.preventDefault();
+        document.body.classList.toggle("focus-mode");
+        showToast("Focus mode");
+      }
+    });
+
+    page.style.fontSize = `${state.fontSize || 18}px`;
+    fontSize.value = state.fontSize || 18;
+    sizeValue.textContent = fontSize.value;
+    applyCoverSettings();
+    renderFiles();
+    renderChapters();
+    loadDocument(state.activeDocId, state.activeChapter || 0, false);
+    setInterval(() => saveState(), 1000);
+  </script>
+</body>
+</html>
