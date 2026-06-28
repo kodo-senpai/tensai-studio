@@ -1496,9 +1496,12 @@
       min-height: 100dvh;
       background: var(--bg-deep);
       color: var(--text);
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
     }
 
     /* ═══════════════════════════════════════════
@@ -2946,6 +2949,7 @@
     .page-stage, main, .rightbar, .nav, .chapters {
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      touch-action: pan-y;
     }
   </style>
 </head>
@@ -4609,8 +4613,10 @@
     });
 
     // ── Touch optimization ──
-    document.addEventListener("touchstart", () => {}, passiveOpt);
-    document.addEventListener("touchmove", () => {}, passiveOpt);
+    // Ensure one-finger scrolling works on all scrollable containers
+    document.querySelectorAll(".page-stage, main, .rightbar, .nav, .chapters, .sidebar, .app").forEach((el) => {
+      el.style.touchAction = "pan-y";
+    });
 
     // ── INIT ──
     page.style.fontSize = `${state.fontSize || 18}px`;
